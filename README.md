@@ -12,6 +12,10 @@ Starting container:
 ```
 sudo docker run -d -p 8080:8080  kdarasz/secure-voting .
 ```
+- with changed port number :
+```
+sudo docker run -d -e SECURE_VOTING_PORT=8999 -p 8999:8999 kdarasz/secure-voting .
+```
 
 ## testing
 

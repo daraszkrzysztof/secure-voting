@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"github.com/emicklei/go-restful"
 	"errors"
+	"os"
 )
 
 type User struct{
@@ -77,8 +78,7 @@ func (svs SecureVotingService) Register()  {
 
 	ws := new(restful.WebService)
 
-	ws.
-		Path("/secure-voting").
+	ws.Path("/secure-voting").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
@@ -101,15 +101,6 @@ func main(){
 	svs := SecureVotingService{}
 	svs.Register()
 
-/*	config := swagger.Config{
-		WebServices: restful.RegisteredWebServices(),
-		WebServicesUrl: "http://localhost:8080",
-		ApiPath:        "/apidocs.json",
-		SwaggerPath:     "/apidocs/",
-		SwaggerFilePath: "/home/krzysztof/dev/github/swagger-ui/dist",
-	}
-	swagger.InstallSwaggerService(config)*/
-
 	log.Printf("[secure-voting] start.")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("SECURE_VOTING_PORT"), nil))
 }
