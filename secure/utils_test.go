@@ -1,5 +1,7 @@
 package secure
-import "testing"
+import (
+	"testing"
+)
 
 func TestIfCanLoadPage(t *testing.T){
 
@@ -20,5 +22,39 @@ func TestIfCanLoadPage(t *testing.T){
 		if got != c.want {
 			t.Fatalf("Got %s, want %s!", got, c.want)
 		}
+	}
+}
+
+func TestIfCanGenerateKeyPair(t *testing.T){
+
+	//arrange
+	//act
+	privateKey, err := GenerateRSAKeyPair()
+
+	//assert
+	if err != nil {
+		t.Fail()
+	}
+
+	if privateKey==nil {
+		t.Fail()
+	}
+}
+
+func TestIfCanMarshallKeyPair(t *testing.T){
+
+	//arrange
+	privateKey, err := GenerateRSAKeyPair()
+
+	//act
+	priv_der, pub_pem, err := MarshalToX509KeyPair(privateKey)
+
+	//assert
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	if priv_der==nil || pub_pem==nil {
+		t.Fail()
 	}
 }

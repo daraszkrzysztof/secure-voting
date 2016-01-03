@@ -8,5 +8,4 @@ RUN go get github.com/emicklei/go-restful
 RUN go install github.com/daraszkrzysztof/secure-voting
 ENTRYPOINT /go/bin/secure-voting
 
-
 EXPOSE 8080
