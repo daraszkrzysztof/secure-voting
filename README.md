@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/daraszkrzysztof/secure-voting.svg?branch=master)](https://travis-ci.org/daraszkrzysztof/secure-voting.svg?branch=master)
+
 # secure-voting
 Application for secure voting. Provides security, anonymity, ballot casting assurance, verifiability with functionality of multiple trustee.
 
