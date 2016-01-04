@@ -5,22 +5,37 @@ Application for secure voting. Provides security, anonymity, ballot casting assu
 
 ## installation
 
+Building volume:
+```
+docker volume create --name mongo-db-volume
+```
+
+Creating bridge network:
+```
+docker network create -d bridge secure-voting-net
+```
+
 Building image:
 ```
-sudo docker build -t kdarasz/secure-voting .
+docker build -t kdarasz/secure-voting .
 ```
 
 Starting container:
 ```
-sudo docker run -d -p 8080:8080  kdarasz/secure-voting .
+docker run -d -p 8080:8080  kdarasz/secure-voting .
 ```
 - with changed port number :
 ```
-sudo docker run -d -e SECURE_VOTING_PORT=8999 -p 8999:8999 kdarasz/secure-voting .
+docker run -d -e SECURE_VOTING_PORT=8999 -p 8999:8999 kdarasz/secure-voting .
 ```
+
+Running application with database:
+```
+sudo docker-compose up -d
 
 ## testing
 
+Testing functionality:
 ```
-curl -X PUT --verbose -H "Content-Type: application/json" -H "organizer-password: zaq12wsx" http://localhost:8080/secure-voting/new-organizer/org1
+curl -X PUT --verbose -H "Content-Type: application/json" -H "organizer-password: abc123" http://localhost:8080/secure-voting/new-organizer/org1
 ```

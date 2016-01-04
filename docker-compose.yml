@@ -1,0 +1,18 @@
+secure-voting:
+  image:  kdarasz/secure-voting:latest
+  container_name : "secure-voting-app"
+  environment:
+    - MONGODB_URI=secure-voting-mongodb
+  ports:
+    - 8080:8080
+  net:  secure-voting-net
+
+mongodb:
+  image:  mongo:3.2.0
+  container_name : "secure-voting-mongodb"
+  command: --smallfiles --rest
+  volumes:
+    - mongo-db-volume:/data/db
+  ports:
+    - 27017:27017
+  net:    secure-voting-net
