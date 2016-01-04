@@ -9,12 +9,10 @@ Building volume:
 ```
 docker volume create --name mongo-db-volume
 ```
-
 Creating bridge network:
 ```
 docker network create -d bridge secure-voting-net
 ```
-
 Building image:
 ```
 docker build -t kdarasz/secure-voting .
@@ -28,10 +26,10 @@ docker run -d -p 8080:8080  kdarasz/secure-voting .
 ```
 docker run -d -e SECURE_VOTING_PORT=8999 -p 8999:8999 kdarasz/secure-voting .
 ```
-
-Running application with database:
+- running application with database:
 ```
 sudo docker-compose up -d
+```
 
 ## testing
 
