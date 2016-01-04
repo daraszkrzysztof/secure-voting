@@ -4,27 +4,38 @@ import (
 	"errors"
 )
 
-type User struct {
-	Id         string
-	PasswdHash string
+type Organizer struct {
+	Id         		string
+	PasswdHash 		string
+	HoldingElections map[string]Election
 }
 
-type Organizer struct {
-	UserData         User
-	HoldingElections []Election
+/**
+the most secure way would be :
+1. send an email with confirmation
+2. after clicking the link in the email, he would received PrivateKey in base64 format
+3. after sending private key, public key is saved in a structure
+
+the simplest solution : define board member, in response receive private key
+ */
+type BoardMember struct {
+	Name,Email		string
+	PublicKeyDer 	[]byte
 }
 
 type Voter struct {
-	Id, Email string
+	Name, Email 	string
 }
 
 type Election struct {
-	Id, Title string
-	Options   []string
-	Voters    []Voter
+	Id, Title 	string
+	Options   	[]string
+	Voters    	[]Voter
+	BoardMember []BoardMember
 }
 
 type SecureVoting struct {
+	Admins			map[string]Admin
 	ActiveElections map[string]Election
 	Organizers      map[string]Organizer
 }
@@ -33,6 +44,16 @@ func NewSecureVoting() *SecureVoting {
 	return &SecureVoting{
 		ActiveElections: make(map[string]Election),
 		Organizers: make(map[string]Organizer)}
+}
+
+func (sv *SecureVoting)CheckAdmin(adminId, adminPasswd string) (Admin, error){
+
+	admin := sv.Admins[adminId]
+	if admin && admin.authenticate(adminPasswd){
+		return admin
+	}else {
+		return nil,errors.New("Admin "+adminId+" does not exist or passwd invalid.")
+	}
 }
 
 func (sv *SecureVoting)ListElections() []string {
@@ -65,7 +86,7 @@ func (sv *SecureVoting)CreateOrganizer(id string, passwd string) (Organizer, err
 		return Organizer{},errors.New("Organizer "+id+" already exists.")
 	}else{
 		passwd :=secure.DoUserPasswdHash(passwd)
-		organizer := Organizer{User{Id:id, PasswdHash: passwd}, []Election{}}
+		organizer := Organizer{Id:id, PasswdHash: passwd, []Election{}}
 		sv.Organizers[id] = organizer
 	}
 	return sv.Organizers[id],nil
@@ -74,7 +95,7 @@ func (sv *SecureVoting)CreateOrganizer(id string, passwd string) (Organizer, err
 func (sv *SecureVoting)checkOrganizer(organizerId, organizerPasswd string) (Organizer, error) {
 
 	if foundOrganizer, okFound := sv.Organizers[organizerId]; okFound {
-		if foundOrganizer.UserData.PasswdHash == secure.DoUserPasswdHash(organizerPasswd) {
+		if foundOrganizer.PasswdHash == secure.DoUserPasswdHash(organizerPasswd) {
 			return foundOrganizer, nil
 		}else{
 			return Organizer{},errors.New("Incorrect password.")
@@ -93,6 +114,6 @@ func (sv *SecureVoting)CreateElections(organizerId, organizerPasswd, electionId 
 	}
 }
 
-func (u *User)CreateElections(organizerId, title string) (Election, error) {
+func (u *Organizer)CreateElections(organizerId, title string) (Election, error) {
 	return Election{Id: "1", Title: title, Options: []string{"Candidate A", "Candidate B"}}, nil
 }

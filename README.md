@@ -35,5 +35,5 @@ sudo docker-compose up -d
 
 Testing functionality:
 ```
-curl -X PUT --verbose -H "Content-Type: application/json" -H "organizer-password: abc123" http://localhost:8080/secure-voting/new-organizer/org1
+curl -X PUT --verbose -H "Content-Type: application/json" -H "organizer-password: abc123" http://localhost:8080/secure-voting/organizer/orgXY
 ```
