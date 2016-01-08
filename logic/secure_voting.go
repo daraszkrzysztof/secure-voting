@@ -49,10 +49,10 @@ func NewSecureVoting() *SecureVoting {
 func (sv *SecureVoting)CheckAdmin(adminId, adminPasswd string) (Admin, error){
 
 	admin := sv.Admins[adminId]
-	if admin && admin.authenticate(adminPasswd){
-		return admin
+	if &admin!=nil && admin.authenticate(adminPasswd){
+		return admin, nil
 	}else {
-		return nil,errors.New("Admin "+adminId+" does not exist or passwd invalid.")
+		return Admin{},errors.New("Admin "+adminId+" does not exist or passwd invalid.")
 	}
 }
 
@@ -85,8 +85,8 @@ func (sv *SecureVoting)CreateOrganizer(id string, passwd string) (Organizer, err
 
 		return Organizer{},errors.New("Organizer "+id+" already exists.")
 	}else{
-		passwd :=secure.DoUserPasswdHash(passwd)
-		organizer := Organizer{Id:id, PasswdHash: passwd, []Election{}}
+		opasswd :=secure.DoUserPasswdHash(passwd)
+		organizer := Organizer{ id, opasswd, make(map[string]Election) }
 		sv.Organizers[id] = organizer
 	}
 	return sv.Organizers[id],nil
@@ -109,7 +109,7 @@ func (sv *SecureVoting)CreateElections(organizerId, organizerPasswd, electionId 
 
 	if organizer, err := sv.checkOrganizer(organizerId, organizerPasswd); err!=nil {
 
-		organizer.HoldingElections = append(organizer.HoldingElections, initElectionConfig)
+		organizer.HoldingElections[electionId] = initElectionConfig
 		sv.ActiveElections[electionId] = initElectionConfig
 	}
 }
