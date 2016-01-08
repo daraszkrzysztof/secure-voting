@@ -42,6 +42,7 @@ type SecureVoting struct {
 
 func NewSecureVoting() *SecureVoting {
 	return &SecureVoting{
+		Admins: make(map[string]Admin),
 		ActiveElections: make(map[string]Election),
 		Organizers: make(map[string]Organizer)}
 }
@@ -70,11 +71,11 @@ func (sv *SecureVoting)ListElections() []string {
 
 func (sv *SecureVoting)GetElectionInfo(electionId string) (Election, error) {
 
-	foundElection, ok := sv.ActiveElections[electionId]
+	if foundElection, ok := sv.ActiveElections[electionId]; ok {
 
-	if ok {
 		return Election{Id:foundElection.Id, Title:foundElection.Title, Options:foundElection.Options},nil
 	} else {
+
 		return Election{}, errors.New("Couldn't find "+electionId+" election.")
 	}
 }
@@ -85,7 +86,7 @@ func (sv *SecureVoting)CreateOrganizer(id string, passwd string) (Organizer, err
 
 		return Organizer{},errors.New("Organizer "+id+" already exists.")
 	}else{
-		opasswd :=secure.DoUserPasswdHash(passwd)
+		opasswd :=secure.DoPasswdHash(passwd)
 		organizer := Organizer{ id, opasswd, make(map[string]Election) }
 		sv.Organizers[id] = organizer
 	}
@@ -95,7 +96,7 @@ func (sv *SecureVoting)CreateOrganizer(id string, passwd string) (Organizer, err
 func (sv *SecureVoting)checkOrganizer(organizerId, organizerPasswd string) (Organizer, error) {
 
 	if foundOrganizer, okFound := sv.Organizers[organizerId]; okFound {
-		if foundOrganizer.PasswdHash == secure.DoUserPasswdHash(organizerPasswd) {
+		if foundOrganizer.PasswdHash == secure.DoPasswdHash(organizerPasswd) {
 			return foundOrganizer, nil
 		}else{
 			return Organizer{},errors.New("Incorrect password.")

@@ -16,7 +16,7 @@ func TestIfCanLoadPage(t *testing.T){
 
 	for _,c := range testCases {
 		//act
-		got:= DoUserPasswdHash(c.in)
+		got:= DoPasswdHash(c.in)
 
 		//assert
 		if got != c.want {

@@ -3,6 +3,16 @@
 # secure-voting
 Application for secure voting. Provides security, anonymity, ballot casting assurance, verifiability with functionality of multiple trustee.
 
+## building
+```
+go install github.com/daraszkrzysztof/secure-voting
+```
+
+## testing
+```
+go test -v  github.com/daraszkrzysztof/secure-voting
+``
+
 ## installation
 
 Building volume:

@@ -9,7 +9,7 @@ import (
 	"encoding/pem"
 )
 
-func DoUserPasswdHash(input string) string{
+func DoPasswdHash(input string) string{
 
 	hasher := sha512.New()
 	hasher.Write([]byte(input))

@@ -9,5 +9,5 @@ type Admin struct {
 }
 
 func (adm *Admin)authenticate(admPasswd string) bool {
-	return adm.PasswdHash == secure.DoUserPasswdHash(admPasswd)
+	return adm.PasswdHash == secure.DoPasswdHash(admPasswd)
 }

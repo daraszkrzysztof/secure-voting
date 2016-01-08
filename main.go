@@ -8,6 +8,7 @@ import (
 	"os"
 	"encoding/json"
 	"github.com/daraszkrzysztof/secure-voting/logic"
+	"github.com/daraszkrzysztof/secure-voting/secure"
 )
 
 type SecureVotingService struct {
@@ -15,7 +16,22 @@ type SecureVotingService struct {
 }
 
 func NewSecureVotingService() *SecureVotingService{
-	return &SecureVotingService{sv : logic.NewSecureVoting()}
+
+	secureVoting := logic.NewSecureVoting()
+
+	adminLogin := os.Getenv("ADMIN_LOGIN")
+	adminSecret := os.Getenv("ADMIN_SECRET")
+
+	if adminLogin == "" {
+		adminLogin = "admin-test"
+	}
+	if adminSecret == "" {
+		adminSecret = "abc123"
+	}
+
+	secureVoting.Admins[adminLogin] = logic.Admin{ adminLogin, secure.DoPasswdHash(adminSecret)}
+
+	return &SecureVotingService{ secureVoting }
 }
 
 func (svs SecureVotingService)checkAdmin(request *restful.Request, response *restful.Response) (finish bool) {
