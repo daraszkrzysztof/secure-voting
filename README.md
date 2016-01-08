@@ -11,7 +11,7 @@ go install github.com/daraszkrzysztof/secure-voting
 ## testing
 ```
 go test -v  github.com/daraszkrzysztof/secure-voting
-``
+```
 
 ## installation
 
