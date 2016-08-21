@@ -9,13 +9,14 @@ import (
 	"encoding/json"
 	"github.com/daraszkrzysztof/secure-voting/logic"
 	"github.com/daraszkrzysztof/secure-voting/secure"
+	"strconv"
 )
 
 type SecureVotingService struct {
 	sv *logic.SecureVoting
 }
 
-func NewSecureVotingService() *SecureVotingService{
+func NewSecureVotingService() *SecureVotingService {
 
 	secureVoting := logic.NewSecureVoting()
 
@@ -29,9 +30,9 @@ func NewSecureVotingService() *SecureVotingService{
 		adminSecret = "abc123"
 	}
 
-	secureVoting.Admins[adminLogin] = logic.Admin{ adminLogin, secure.DoPasswdHash(adminSecret)}
+	secureVoting.Admins[adminLogin] = logic.Admin{adminLogin, secure.DoPasswdHash(adminSecret)}
 
-	return &SecureVotingService{ secureVoting }
+	return &SecureVotingService{secureVoting }
 }
 
 func (svs SecureVotingService)checkAdmin(request *restful.Request, response *restful.Response) (finish bool) {
@@ -84,7 +85,7 @@ func (svs SecureVotingService)createOrganiser(request *restful.Request, response
 
 	if org, err := svs.sv.CreateOrganizer(orgName, orgPasswd); err != nil {
 		response.WriteError(http.StatusInternalServerError, errors.New("Not able to create new election."))
-	}else {
+	} else {
 		response.WriteAsJson(org)
 	}
 
@@ -136,48 +137,48 @@ func (svs *SecureVotingService) Register() {
 	ws := new(restful.WebService)
 
 	ws.Path("/secure-voting").
-	Consumes(restful.MIME_JSON).
-	Produces(restful.MIME_JSON)
+		Consumes(restful.MIME_JSON).
+		Produces(restful.MIME_JSON)
 
 	//admin interface
 
 	ws.Route(ws.GET("/admin/{admin-login}/elections/{election-id}").
-	To(svs.findElection).
-	Param(ws.HeaderParameter("admin-password", "password for organizer's account")).
-	Param(ws.PathParameter("admin-login", "admin login")).
-	Param(ws.PathParameter("election-id", "id of the election")).
-	Returns(200, "OK", []logic.Election{}))
+		To(svs.findElection).
+		Param(ws.HeaderParameter("admin-password", "password for organizer's account")).
+		Param(ws.PathParameter("admin-login", "admin login")).
+		Param(ws.PathParameter("election-id", "id of the election")).
+		Returns(200, "OK", []logic.Election{}))
 
 	ws.Route(ws.GET("/admin/{admin-login}/list-elections").
-	To(svs.listElections).
-	Param(ws.HeaderParameter("organizer-password", "password for organizer's account")).
-	Param(ws.PathParameter("admin-login", "admin login")).
-	Returns(200, "OK", []string{}))
+		To(svs.listElections).
+		Param(ws.HeaderParameter("organizer-password", "password for organizer's account")).
+		Param(ws.PathParameter("admin-login", "admin login")).
+		Returns(200, "OK", []string{}))
 
 	//organizer interface
 
 	ws.Route(ws.PUT("/organizer/{organizer-name}").To(svs.createOrganiser).
-	Doc("Creates new organizer, if do not exist.").
-	Operation("createOrganizer").
-	Param(ws.HeaderParameter("organizer-password", "password for organizer's account")).
-	Param(ws.PathParameter("organizer-name", "id of the organizer")).
-	Writes(logic.Organizer{}))
+		Doc("Creates new organizer, if do not exist.").
+		Operation("createOrganizer").
+		Param(ws.HeaderParameter("organizer-password", "password for organizer's account")).
+		Param(ws.PathParameter("organizer-name", "id of the organizer")).
+		Writes(logic.Organizer{}))
 
 	ws.Route(ws.POST("/{organizer-name}/election/{election-id}").To(svs.createElection).
-	Doc("Creates new election for given organizer.").
-	Operation("createNewElection").
-	Param(ws.HeaderParameter("organizer-password", "password for organizer's account")).
-	Param(ws.PathParameter("organizer-name", "id of the organizer")).
-	Param(ws.PathParameter("election-id", "id of the new election")).
-	Writes(logic.Organizer{}))
+		Doc("Creates new election for given organizer.").
+		Operation("createNewElection").
+		Param(ws.HeaderParameter("organizer-password", "password for organizer's account")).
+		Param(ws.PathParameter("organizer-name", "id of the organizer")).
+		Param(ws.PathParameter("election-id", "id of the new election")).
+		Writes(logic.Organizer{}))
 
 	ws.Route(ws.PUT("/{organizer-name}/election/{election-id}/board-members").To(svs.createElectionBoardMembers).
-	Doc("Creates new election for given organizer.").
-	Operation("createNewElection").
-	Param(ws.HeaderParameter("organizer-password", "password for organizer's account")).
-	Param(ws.PathParameter("organizer-name", "id of the organizer")).
-	Param(ws.PathParameter("election-id", "id of the new election")).
-	Writes(logic.Organizer{}))
+		Doc("Creates new election for given organizer.").
+		Operation("createNewElection").
+		Param(ws.HeaderParameter("organizer-password", "password for organizer's account")).
+		Param(ws.PathParameter("organizer-name", "id of the organizer")).
+		Param(ws.PathParameter("election-id", "id of the new election")).
+		Writes(logic.Organizer{}))
 
 	restful.Add(ws)
 }
@@ -192,5 +193,9 @@ func main() {
 
 	svs.Register()
 
-	log.Fatal(http.ListenAndServe(":" + os.Getenv("SECURE_VOTING_PORT"), nil))
+	if (os.Getenv("SECURE_VOTING_PORT") == "") {
+		log.Fatal(http.ListenAndServe(":" + strconv.Itoa(8999), nil))
+	} else {
+		log.Fatal(http.ListenAndServe(":" + os.Getenv("SECURE_VOTING_PORT"), nil))
+	}
 }
